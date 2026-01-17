@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Manufacturing | Industrial AI Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. GLOBAL RESET --- */
+        :root {
+            --bg-dark: #0f172a;
+            --text-main: #ffffff;
+            --text-muted: rgba(255,255,255,0.7);
+            --accent: #7cf2d6;
+            --sidebar-width: 260px;
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e2a38, #2c3e50);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-left: var(--sidebar-width);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* --- 2. SIDEBAR NAVIGATION --- */
+        .sidebar-nav {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 22px; font-weight: 800; color: white; text-decoration: none;
+            display: flex; align-items: center; gap: 12px; margin-bottom: 50px;
+        }
+        .logo i { color: var(--accent); }
+        .logo span { color: var(--accent); }
+
+        .nav-links { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+
+        .nav-item {
+            text-decoration: none; color: var(--text-muted);
+            padding: 12px 15px; border-radius: 10px; font-size: 15px;
+            display: flex; align-items: center; gap: 15px; transition: 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(124, 242, 214, 0.1); color: var(--accent); transform: translateX(5px);
+        }
+
+        .login-btn {
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            background: linear-gradient(135deg, #7cf2d6, #4facfe);
+            color: #0f172a; font-weight: bold; padding: 12px; border-radius: 8px;
+            text-decoration: none; box-shadow: 0 4px 15px rgba(124, 242, 214, 0.3);
+        }
+
+        /* --- 3. SECTIONS --- */
+        .hero-section {
+            min-height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 0 50px; position: relative;
+        }
+
+        .hero-title {
+            font-size: 64px; font-weight: 800; margin-bottom: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #a5f3fc 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .ticker-container {
+            display: flex; gap: 30px; background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 30px;
+            border-radius: 50px; margin-bottom: 40px;
+        }
+
+        .feature-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px; max-width: 1200px; margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px; border-radius: 20px; transition: 0.3s;
+        }
+        .feature-card:hover { transform: translateY(-10px); border-color: var(--accent); }
+        .feature-card i { font-size: 30px; color: var(--accent); margin-bottom: 20px; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    </style>
+</head>
+<body onload="setMinDate()">
+
+<aside class="sidebar-nav">
+    <a href="#" class="logo"><i class="fas fa-layer-group"></i> Smart <span>Manufacturing</span></a>
+    <nav class="nav-links">
+        <a href="#" class="nav-item active"><i class="fas fa-home"></i> Home</a>
+        <a href="#features" class="nav-item"><i class="fas fa-cubes"></i> Platform</a>
+        <a href="#marketing" class="nav-item"><i class="fas fa-ad"></i> Marketing</a> 
+        <a href="#edukaan" class="nav-item"><i class="fas fa-shopping-basket"></i> e-Dukaan</a> 
+        <a href="#solutions" class="nav-item"><i class="fas fa-network-wired"></i> Solutions</a>
+        <a href="#analytics" class="nav-item"><i class="fas fa-chart-bar"></i> Analytics</a>
+        <a href="#contact" class="nav-item"><i class="fas fa-envelope"></i> Contact</a>
+    </nav>
+    <div class="nav-footer">
+        <a href="login.html" class="login-btn"><i class="fas fa-sign-in-alt"></i> Login Portal</a>
+    </div>
+</aside>
+
+<main>
+    <section class="hero-section">
+        <div class="hero-title">The Future of <br> Industrial Autonomy</div>
+        <p style="color: var(--text-muted); max-width: 700px; margin-bottom: 40px;">Integrate Predictive AI and Real-Time Telemetry into a unified manufacturing ecosystem.</p>
+        <div class="ticker-container">
+            <div class="ticker-item">SYSTEM LIVE</div>
+            <div class="ticker-item">AI MODE: <strong>AGENTIC</strong></div>
+            <div class="ticker-item">UPTIME: <strong>99.98%</strong></div>
+        </div>
+    </section>
+
+    <section id="features" style="padding: 80px 50px;">
+        <h2 style="text-align: center; margin-bottom: 50px;">Intelligence at Scale</h2>
+        <div class="feature-grid">
+            <div class="feature-card"><i class="fas fa-brain"></i><h3>Predictive AI</h3><p>Analyze sensor vibration to predict failures before they happen.</p></div>
+            <div class="feature-card"><i class="fas fa-sync-alt"></i><h3>Autonomous Supply</h3><p>Inventory levels monitored and auto-restocked by AI.</p></div>
+            <div class="feature-card"><i class="fas fa-chart-pie"></i><h3>Instant Analytics</h3><p>Generate OEE and yield reports with a single click.</p></div>
+        </div>
+    </section>
+
+    <section id="marketing" style="padding: 80px 50px; background: rgba(124, 242, 214, 0.05);">
+        <h2 style="text-align: center; margin-bottom: 50px;">Growth & Sales Achievements</h2>
+        <div class="feature-grid">
+            <div class="feature-card" style="text-align: center;">
+                <i class="fas fa-trophy"></i>
+                <div style="font-size: 40px; color: var(--accent); font-weight: 800;">45,000</div>
+                <h3>Tons Produced</h3>
+                <p>Total raw material processed this quarter.</p>
+            </div>
+            <div class="feature-card" style="text-align: center;">
+                <i class="fas fa-chart-line"></i>
+                <div style="font-size: 40px; color: var(--accent); font-weight: 800;">18 Lakh</div>
+                <h3>Net Sales</h3>
+                <p>Direct digital revenue generated via E-portal.</p>
+            </div>
+            <div class="feature-card" style="text-align: center;">
+                <i class="fas fa-users"></i>
+                <div style="font-size: 40px; color: var(--accent); font-weight: 800;">1,200</div>
+                <h3>Active Orders</h3>
+                <p>Ongoing supply chain fulfillments in progress.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="edukaan" style="padding: 80px 50px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.05);">
+        <h2 style="text-align: center; margin-bottom: 30px;">e-Dukaan Portal</h2>
+        <div style="max-width: 600px; margin: 0 auto; background: rgba(255,255,255,0.03); padding: 40px; border-radius: 20px; border: 1px solid var(--accent); text-align: center;">
+            <i class="fas fa-shopping-cart" style="font-size: 50px; color: var(--accent); margin-bottom: 20px;"></i>
+            <h3>Direct Factory Ordering</h3>
+            <div style="margin-top: 20px; text-align: left;">
+    <label style="display: block; font-size: 14px; margin-bottom: 5px; color: var(--accent);">Full Name</label>
+    <input type="text" id="userName" placeholder="Enter your name" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; margin-bottom: 15px;">
+    
+    </div>
+            <div style="margin-top: 20px; text-align: left;">
+                <label style="display: block; font-size: 14px; margin-bottom: 5px; color: var(--accent);">Select Product</label>
+    <select id="prodType" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; margin-bottom: 15px;">
+    <option value="5000">STEEL SHEETS (₹5,000/Unit)</option>
+    <option value="1200">COPPER WIRE (₹1,200/Unit)</option>
+    <option value="25000">MICROCHIP (₹25,000/Unit)</option>
+    <option value="800">LUBRICANT (₹800/Unit)</option>
+    <option value="3500">PISTON RING (₹3,500/Unit)</option>
+    <option value="75000">NEURAL CHIP (₹75,000/Unit)</option>
+    <option value="15000">HYDRAULIC VALVE (₹15,000/Unit)</option>
+    <option value="4500">CIRCUIT BOARD (₹4,500/Unit)</option>
+    <option value="2200">SENSOR UNIT (₹2,200/Unit)</option>
+    <option value="120000">NANO-FIBER CHASSIS (₹120,000/Unit)</option>
+</select>
+
+                <div style="display: flex; gap: 15px; margin-bottom: 25px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; font-size: 14px; margin-bottom: 5px; color: var(--accent);">Quantity</label>
+                        <input type="number" id="prodQty" min="1" placeholder="Units" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 5px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; font-size: 14px; margin-bottom: 5px; color: var(--accent);">Deadline</label>
+                        <input type="date" id="deadline" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 5px;">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="placeOrder()" style="background: var(--accent); color: #0f172a; border: none; padding: 15px 40px; border-radius: 8px; font-weight: 800; cursor: pointer; width: 100%; transition: 0.3s;">
+                PLACE ORDER
+            </button>
+        </div>
+    </section>
+
+    <section id="neural-ops" style="padding: 80px 50px; background: #050505; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent);">
+        <div style="display: flex; gap: 50px; align-items: center; max-width: 1100px; margin: 0 auto;">
+            <div style="flex: 1;">
+                <h2 style="color: var(--accent);">Neural <span style="color: white;">Operations</span></h2>
+                <p style="color: var(--text-muted); line-height: 1.8;">Our proprietary Cortex-AI performs "Self-Healing" by automatically adjusting machine RPM and torque to maintain stability without human intervention.</p>
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <span style="border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; border-radius: 4px; font-size: 12px;">MODE: AUTONOMOUS</span>
+                    <span style="border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; border-radius: 4px; font-size: 12px;">CORE: NEURAL-LINK V4</span>
+                </div>
+            </div>
+            <div style="flex: 1; background: #000; border-radius: 10px; padding: 25px; border: 1px solid rgba(124, 242, 214, 0.3); font-family: monospace;">
+                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <div style="width: 10px; height: 10px; background: #ff6b6b; border-radius: 50%;"></div>
+                    <div style="width: 10px; height: 10px; background: #f1c40f; border-radius: 50%;"></div>
+                    <div style="width: 10px; height: 10px; background: #7cf2d6; border-radius: 50%;"></div>
+                </div>
+                <div style="color: #7cf2d6;">[SYS] Booting Neural-Link...</div>
+                <div style="color: #aaa;">[DATA] Analyzing Sensor-Node_04...</div>
+                <div style="color: #f1c40f;">[WARN] Vibration Anomaly Detected.</div>
+                <div style="color: #7cf2d6;">[ACTION] Adjusting RPM to stabilize...</div>
+                <div style="color: #fff; font-weight: bold;">[STATUS] System Self-Healed.</div>
+                <div style="color: var(--accent); animation: blink 1s infinite;">_</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="solutions" style="padding: 100px 50px;">
+        <h2 style="text-align: center; margin-bottom: 50px;">Industry Solutions</h2>
+        <div style="display: flex; flex-direction: column; gap: 20px; max-width: 800px; margin: 0 auto;">
+            <div class="solution-item" style="background: rgba(255,255,255,0.03); padding: 25px; border-radius: 15px; border-left: 4px solid var(--accent);">
+                <h3><i class="fas fa-vr-cardboard"></i> Digital Twin Simulation</h3>
+                <p style="color: var(--text-muted);">Create virtual replicas of production lines to test workflows before deployment.</p>
+            </div>
+            <div class="solution-item" style="background: rgba(255,255,255,0.03); padding: 25px; border-radius: 15px; border-left: 4px solid #4facfe;">
+                <h3><i class="fas fa-tools"></i> Zero-Downtime Maintenance</h3>
+                <p style="color: var(--text-muted);">Predictive scheduling that reduces machine idle time by 35% annually.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="analytics" style="padding: 80px 50px; background: rgba(255,255,255,0.02);">
+        <h2 style="text-align: center; margin-bottom: 50px;">Operational Intelligence</h2>
+        <div class="feature-grid">
+            <div class="feature-card" style="text-align:center;"><div style="font-size:40px; color:var(--accent); font-weight: 800;">94.2%</div><h3>System OEE</h3></div>
+            <div class="feature-card" style="text-align:center;"><div style="font-size:40px; color:#4facfe; font-weight: 800;">12</div><h3>Failures Prevented</h3></div>
+            <div class="feature-card" style="text-align:center;"><div style="font-size:40px; color:#a5f3fc; font-weight: 800;">-18%</div><h3>Energy Usage</h3></div>
+        </div>
+    </section>
+
+    <section id="contact" style="padding: 80px 20px; text-align: center;">
+        <p style="color: var(--accent); font-size: 18px; font-weight: 500;">
+            <i class="fas fa-headset"></i> Support: +1 (888) AI-SMART | <i class="fas fa-envelope"></i> support@factory.ai
+        </p>
+    </section>
+
+    <footer style="padding: 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+        <p style="color: var(--text-muted); font-size: 14px;">© 2026 Industrial Intelligence Systems. All rights reserved.</p>
+    </footer>
+</main>
+
+<script>
+    // 1. SET MINIMUM DATE TO TODAY
+    function setMinDate() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('deadline').setAttribute('min', today);
+    }
+async function placeOrder() {
+    // 1. Capture the new Name field
+    const name = document.getElementById('userName').value;
+    const price = document.getElementById('prodType').value;
+    const qty = document.getElementById('prodQty').value;
+    const dateInput = document.getElementById('deadline').value;
+    const prodName = document.getElementById('prodType').options[document.getElementById('prodType').selectedIndex].text.split(' (')[0];
+    
+    const selectedDate = new Date(dateInput);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    // 2. Validation: Ensure name is provided
+    if(name.trim() === "") return alert("⚠️ Error: Please enter your name.");
+    if(qty <= 0 || qty === "") return alert("⚠️ Error: Quantity must be 1 or more.");
+    if(dateInput === "") return alert("⚠️ Error: Please select a valid deadline.");
+    if(selectedDate < today) return alert("⚠️ Error: Deadline cannot be in the past.");
+
+    const total = price * qty;
+
+    try {
+        const response = await fetch('/api/shop/order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                customer_name: name, // Send name to backend
+                product: prodName,
+                quantity: qty,
+                total: total,
+                deadline: dateInput
+            })
+        });
+        const resData = await response.json();
+
+        if(resData.status === 'success') {
+            alert('✅ Order ID: ' + resData.order_id + '\nPlaced for: ' + name + '\nTotal: ₹' + total.toLocaleString());
+            // Clear inputs
+            document.getElementById('userName').value = "";
+            document.getElementById('prodQty').value = "";
+            document.getElementById('deadline').value = "";
+        }
+    } catch(e) {
+        alert("❌ Server Error: Could not place order.");
+        console.error(e);
+    }
+}
+    // 2. PLACE ORDER LOGIC (WITH PROTECTION)
+async function placeOrder() {
+        const price = document.getElementById('prodType').value;
+        const qty = document.getElementById('prodQty').value;
+        const dateInput = document.getElementById('deadline').value;
+        const prodName = document.getElementById('prodType').options[document.getElementById('prodType').selectedIndex].text.split(' (')[0];
+        
+        const selectedDate = new Date(dateInput);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        if(qty <= 0 || qty === "") return alert("⚠️ Error: Quantity must be 1 or more.");
+        if(dateInput === "") return alert("⚠️ Error: Please select a valid deadline.");
+        if(selectedDate < today) return alert("⚠️ Error: Deadline cannot be in the past.");
+
+        const total = price * qty;
+
+        // --- NEW: SEND TO BACKEND ---
+        try {
+            const response = await fetch('/api/shop/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    product: prodName,
+                    quantity: qty,
+                    total: total,
+                    deadline: dateInput
+                })
+            });
+            const resData = await response.json();
+
+            if(resData.status === 'success') {
+                alert('✅ Order ID: ' + resData.order_id + '\nSuccessfully placed and sent to Manager Board.\nTotal: ₹' + total.toLocaleString());
+                document.getElementById('prodQty').value = "";
+            }
+        } catch(e) {
+            alert("❌ Server Error: Could not place order.");
+            console.error(e);
+        }
+    }
+</script>
+
+</body>
+</html>

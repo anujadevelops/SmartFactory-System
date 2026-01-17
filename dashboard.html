@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Operator HUD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    
+    <style>
+        /* --- CORE THEME --- */
+        :root {
+            --bg-dark: #050a10; 
+            --panel-bg: rgba(16, 26, 38, 0.85);
+            --accent-cyan: #00f3ff; 
+            --accent-green: #00ff9d;
+            --accent-warn: #ffb700; 
+            --accent-alert: #ff4757;
+            --border: 1px solid rgba(0, 243, 255, 0.15);
+            --glass: blur(12px);
+        }
+        
+        body { margin: 0; background: radial-gradient(circle at center, #111921 0%, #020202 100%); color: white; font-family: 'Segoe UI', monospace; overflow: hidden; height: 100vh; }
+        
+        /* GRID LAYOUT */
+        .hud-grid {
+            display: grid; 
+            grid-template-columns: 350px 1fr 350px; 
+            grid-template-rows: 60px 1fr 90px; 
+            height: 100vh; gap: 15px; padding: 20px; box-sizing: border-box;
+        }
+
+        .hud-panel {
+            background: var(--panel-bg); border: var(--border); border-radius: 12px;
+            padding: 15px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: flex; flex-direction: column; position: relative; backdrop-filter: var(--glass);
+            overflow: hidden;
+        }
+
+        /* --- HEADER --- */
+        .top-bar { 
+            grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; 
+            border-bottom: 2px solid var(--accent-cyan); background: rgba(5, 10, 15, 0.95);
+        }
+        .logo-text { font-size: 22px; font-weight: 800; letter-spacing: 3px; text-shadow: 0 0 10px var(--accent-cyan); display:flex; align-items:center; gap:10px; }
+        
+        .status-pill {
+            padding: 6px 20px; border-radius: 30px; font-weight: bold; font-size: 14px; text-transform: uppercase;
+            background: #111; color: #555; transition: 0.3s; border: 1px solid #333;
+        }
+        .status-pill.online { background: var(--accent-green); color: black; box-shadow: 0 0 15px var(--accent-green); border-color: transparent; }
+        .status-pill.eco { background: var(--accent-cyan); color: black; box-shadow: 0 0 15px var(--accent-cyan); }
+
+        /* --- LEFT PANEL: TWIN & METRICS --- */
+        #digital-twin-container {
+            flex: 1; 
+            background: rgba(0,0,0,0.6);
+            margin-bottom: 15px; border-radius: 8px; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .metric-box { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .metric-val { font-size: 22px; font-weight: bold; color: white; margin-top: 5px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+        .metric-label { font-size: 10px; color: #aaa; letter-spacing: 1px; }
+
+        .health-wrapper { padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
+        .health-bar-bg { width: 100%; height: 6px; background: #333; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+        .health-bar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--accent-alert), var(--accent-warn), var(--accent-green)); transition: width 0.5s; }
+        
+        /* --- CENTER PANEL: KANBAN --- */
+        .workspace { 
+            grid-column: 2; grid-row: 2; 
+            display: flex; 
+            gap: 15px; 
+            padding: 5px;
+            overflow: hidden;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        
+        .lane { 
+            flex: 1; 
+            min-width: 0; 
+            display: flex; flex-direction: column; 
+            background: rgba(10, 15, 20, 0.6); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 6px;
+        }
+        
+        .lane-header { 
+            padding: 15px 0; 
+            margin: 0 15px;
+            text-align: center; 
+            font-weight: 700; 
+            font-size: 12px; 
+            color: #ddd; 
+            letter-spacing: 1px; 
+            text-transform: uppercase; 
+            background: transparent;
+            border-bottom: 2px solid #555; 
+        }
+
+        .lane-pending .lane-header { border-bottom-color: #aaa; }
+        .lane-progress .lane-header { border-bottom-color: #555; }
+        .lane-qa .lane-header { border-bottom-color: var(--accent-warn); color: var(--accent-warn); }
+        .lane-completed .lane-header { border-bottom-color: var(--accent-green); color: var(--accent-green); }
+
+        .lane-content { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+
+        .task-card {
+            background: rgba(30, 40, 50, 0.9); padding: 15px; border-left: 3px solid #555; border-radius: 4px; 
+            cursor: grab; transition: 0.2s; position: relative; overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .task-card:hover { transform: translateY(-2px); background: rgba(50, 60, 70, 1); }
+        
+        .task-card.active-prod { border-left-color: var(--accent-cyan); }
+        .task-card.paused { border-left-color: var(--accent-alert); opacity: 0.8; background: rgba(60, 30, 30, 0.9); }
+        .task-card.qa { border-left-color: var(--accent-warn); }
+        .task-card.done { border-left-color: var(--accent-green); opacity: 0.7; }
+
+        .progress-track { height: 3px; background: rgba(0,0,0,0.5); margin-top: 8px; border-radius: 2px; }
+        .progress-bar { height: 100%; background: var(--accent-cyan); width: 0%; transition: width 0.5s; }
+
+        /* --- RIGHT PANEL: AI LOG --- */
+        .ai-panel { grid-column: 3; grid-row: 2; display: flex; flex-direction: column; }
+        .ai-log { 
+            flex: 1; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 11px; 
+            background: rgba(0,0,0,0.4); padding: 15px; border-radius: 6px; margin-bottom: 10px; 
+            border: 1px solid rgba(255,255,255,0.05); color: #ccc; line-height: 1.4;
+        }
+        .log-entry { margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+
+        /* --- BOTTOM CONTROLS --- */
+        .control-panel { 
+            grid-column: 1 / -1; grid-row: 3; 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; 
+            align-items: center; 
+            padding: 0 10px; 
+            gap: 20px;
+        }
+        
+        .ctrl-group-left { display: flex; gap: 8px; justify-content: flex-start; }
+        .ctrl-group-right { display: flex; gap: 8px; justify-content: flex-end; }
+        
+        .ctrl-btn { 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
+            color: #ccc; padding: 0 15px; height: 40px; border-radius: 4px; cursor: pointer; transition: 0.2s;
+            font-family: 'Segoe UI', bold; font-size: 12px; letter-spacing: 0.5px; display: flex; gap: 8px; align-items: center; justify-content: center;
+        }
+        .ctrl-btn:hover { border-color: var(--accent-cyan); color: white; background: rgba(0, 243, 255, 0.1); }
+        
+        .btn-start { 
+            background: var(--accent-green); color: black; font-weight: 800; border: none; 
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.3); width: 120px; height: 50px; font-size: 16px; border-radius: 25px;
+        }
+        .btn-start:hover { background: #00e68e; transform: scale(1.05); }
+        
+        .btn-stop { 
+            background: var(--accent-alert); color: white; font-weight: 800; border: none; 
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.3); animation: pulse-red 2s infinite; 
+            width: 120px; height: 50px; font-size: 16px; border-radius: 25px;
+        }
+
+        .btn-repair { border-color: var(--accent-warn); color: var(--accent-warn); }
+        .btn-eco { border-color: var(--accent-green); color: var(--accent-green); }
+        .btn-report { background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; }
+
+        /* MODALS */
+        .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:999; justify-content:center; align-items:center; }
+        .modal-box { background: #1e293b; padding: 30px; border: 1px solid var(--accent-cyan); border-radius: 12px; width: 400px; color: white; box-shadow: 0 0 50px rgba(0, 243, 255, 0.2); }
+        input, select { background: #111; border: 1px solid #444; color: white; padding: 10px; width: 100%; border-radius: 4px; margin-top: 5px; }
+        
+        /* ================= NOTIFICATION SYSTEM (NEWLY UPDATED) ================= */
+        .notif-inbox {
+            position: absolute; right: 20px; top: 70px; width: 360px; max-height: 420px;
+            background: rgba(10,15,20,0.98); border: 1px solid var(--accent-cyan);
+            border-radius: 10px; display: none; z-index: 1200; overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .notif-header { padding: 15px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--accent-cyan); display: flex; justify-content: space-between; align-items: center; }
+        .notif-item { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; transition: 0.2s; }
+        .notif-item:hover { background: rgba(0, 243, 255, 0.05); }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-meta { font-size: 10px; color: #888; display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .notif-btn { margin-top: 8px; background: var(--accent-cyan); color: #000; border: none; padding: 5px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 10px; }
+
+        /* TOAST NOTIFICATIONS */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast-card {
+            background: rgba(16, 26, 38, 0.95); border-left: 4px solid var(--accent-green); color: white;
+            padding: 15px 20px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); min-width: 300px;
+            animation: slideIn 0.3s ease-out; backdrop-filter: blur(10px); display: flex; flex-direction: column; cursor: pointer;
+        }
+        .toast-card.CRITICAL { border-left-color: var(--accent-alert); }
+        .toast-card.WARNING { border-left-color: var(--accent-warn); }
+        .toast-card.INFO { border-left-color: var(--accent-cyan); }
+        .toast-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; color: #aaa; margin-bottom: 5px; text-transform: uppercase; }
+        .toast-body { font-size: 13px; line-height: 1.4; }
+        
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 rgba(255, 71, 87, 0.4); } 50% { box-shadow: 0 0 20px rgba(255, 71, 87, 0); } 100% { box-shadow: 0 0 0 rgba(255, 71, 87, 0); } }
+    </style>
+</head>
+<body onload="initSystem()">
+
+<div id="toast-container"></div> 
+
+<div id="lockedOverlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; flex-direction:column; justify-content:center; align-items:center;">
+    <i class="fas fa-lock" style="font-size:60px; color:var(--accent-alert); margin-bottom:20px;"></i>
+    <h1 style="color:white; letter-spacing: 5px;">SYSTEM LOCKED</h1>
+    <button class="ctrl-btn" onclick="toggleLock()" style="margin-top:20px; border-color:var(--accent-alert); color:var(--accent-alert);">UNLOCK INTERFACE</button>
+</div>
+
+<div id="createOrderModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 style="color:var(--accent-cyan); border-bottom: 1px solid #333; padding-bottom: 10px; margin-top:0;">INITIATE PRODUCTION</h3>
+        <div style="margin: 15px 0;">
+            <label style="font-size:11px; color:#aaa;">PRODUCT TYPE</label>
+<select id="newOrderProduct">
+    <option value="Steel Sheets">Steel Sheets</option>
+    <option value="Copper Wire">Copper Wire</option>
+    <option value="Lubricant">Lubricant</option>
+    <option value="Microchips">Microchips</option>
+    <option value="Hydraulic Valve">Hydraulic Valve (HV-X)</option>
+    <option value="Piston Ring">Cyber-Piston Ring</option>
+    <option value="Neural Chip">Neural Chip v4</option>
+    <option value="Circuit Board">Neural Circuit Board</option>
+    <option value="Sensor Unit">Sensor Unit</option>
+    <option value="Nano-Fiber Chassis">Nano-Fiber Chassis</option>
+</select>
+        </div>
+        <div style="margin-bottom:20px;">
+            <label style="font-size:11px; color:#aaa;">BATCH QUANTITY</label>
+            <input type="number" id="newOrderQty" value="100">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="ctrl-btn" onclick="submitNewOrder()" style="flex:1; background:var(--accent-cyan); color:black; font-weight:bold;">CONFIRM</button>
+            <button class="ctrl-btn" onclick="document.getElementById('createOrderModal').style.display='none'" style="flex:1;">CANCEL</button>
+        </div>
+    </div>
+</div>
+
+<div id="taskModal" class="modal-overlay">
+    <div class="modal-box" style="border-color: var(--accent-warn);">
+        <h3 style="color:var(--accent-warn); margin-top:0;">ORDER DIAGNOSTICS</h3>
+        <div id="taskContent" style="margin: 20px 0; font-family: monospace; line-height: 1.6; color: #ccc; font-size: 14px;"></div>
+        <div style="display: flex; gap: 10px;">
+            <button id="btnPause" class="ctrl-btn" style="flex:1; border-color: var(--accent-alert); color: var(--accent-alert);">FLAG DEFECT</button>
+            <button id="btnDelete" class="ctrl-btn" style="flex:1;">SCRAP ORDER</button>
+        </div>
+        <button class="ctrl-btn" onclick="document.getElementById('taskModal').style.display='none'" style="width:100%; margin-top:10px;">CLOSE</button>
+    </div>
+</div>
+
+<div class="hud-grid">
+    
+    <div class="hud-panel top-bar">
+        <div class="logo-text"><i class="fas fa-layer-group" style="color:var(--accent-cyan)"></i> Operator<span style="color:var(--accent-cyan)">HUB</span></div>
+        <div id="sysStatus" class="status-pill">OFFLINE</div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            
+            <div style="position: relative;">
+                <div onclick="toggleNotifs()" style="cursor:pointer; position:relative; padding: 10px;">
+                    <i class="fas fa-bell" style="color:#aaa; font-size: 20px;"></i>
+                    <div id="notifBadge" style="position:absolute; top:-5px; right:-5px; background:var(--accent-alert); color:white; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:50%; display:none; border: 2px solid #050a10;">0</div>
+                </div>
+
+                <div id="notifInbox" class="notif-inbox">
+                    <div class="notif-header">
+                        INBOX <span id="notifCount" style="opacity: 0.7;"></span>
+                        <span onclick="toggleNotifs()" style="cursor:pointer;"><i class="fas fa-times"></i></span>
+                    </div>
+                    <div id="notifInboxList"></div>
+                </div>
+            </div>
+
+            <button class="ctrl-btn" onclick="toggleLock()"><i class="fas fa-fingerprint"></i> LOCK</button>
+        </div>
+    </div>
+
+    <div class="hud-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <span style="font-size: 10px; color: #666; font-weight:bold;">DIGITAL TWIN</span>
+        </div>
+        
+        <div id="digital-twin-container"></div>
+        
+        <div class="metric-grid">
+            <div class="metric-box">
+                <div class="metric-label">ENGINE RPM</div>
+                <div class="metric-val" style="color:var(--accent-green); text-shadow:0 0 15px var(--accent-green);"><span id="rpmVal">0</span></div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">CORE TEMP</div>
+                <div class="metric-val" style="color:var(--accent-warn); text-shadow:0 0 15px var(--accent-warn);" id="tempVal">0°C</div>
+            </div>
+        </div>
+
+        <div class="health-wrapper">
+            <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:2px;">
+                <span style="color:#aaa;">PREDICTIVE HEALTH</span>
+                <span id="healthText" style="color:var(--accent-green); font-weight:bold;">100%</span>
+            </div>
+            <div class="health-bar-bg">
+                <div id="healthBar" class="health-bar-fill" style="width: 100%;"></div>
+            </div>
+            <div style="font-size:9px; color:#555; margin-top:4px; text-align:right;">AI ANALYSIS: <span id="aiPrediction">OPTIMAL</span></div>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <div class="lane lane-pending" ondrop="drop(event, 'Pending')" ondragover="allowDrop(event)">
+            <div class="lane-header">PENDING</div>
+            <div class="lane-content" id="list-Pending"></div>
+        </div>
+        <div class="lane lane-progress" ondrop="drop(event, 'In Progress')" ondragover="allowDrop(event)">
+            <div class="lane-header">IN PROGRESS</div>
+            <div class="lane-content" id="list-InProgress"></div>
+        </div>
+        <div class="lane lane-qa" ondrop="drop(event, 'QA Check')" ondragover="allowDrop(event)">
+            <div class="lane-header">QA CHECK</div>
+            <div class="lane-content" id="list-QACheck"></div>
+        </div>
+        <div class="lane lane-completed" ondrop="drop(event, 'Completed')" ondragover="allowDrop(event)">
+            <div class="lane-header">COMPLETED</div>
+            <div class="lane-content" id="list-Completed"></div>
+        </div>
+    </div>
+
+    <div class="hud-panel ai-panel">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+            <i class="fas fa-brain" style="color:var(--accent-cyan);"></i>
+            <span style="font-size:12px; font-weight:bold; letter-spacing:1px;">AI ASSISTANT</span>
+        </div>
+        <div class="ai-log" id="aiLog">
+            <div class="log-entry">> System Initialized...</div>
+            <div class="log-entry">> Connecting to Neural Net...</div>
+            <div class="log-entry" style="color:var(--accent-green)">> READY. Waiting for commands.</div>
+        </div>
+        <div style="display:flex; gap:5px;">
+            <input type="text" id="aiInput" placeholder="Command (e.g., 'Repair', 'Status')..." onkeypress="handleEnter(event)">
+            <button class="ctrl-btn" onclick="sendAiCommand()" style="padding: 0 15px;"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <div class="hud-panel control-panel">
+        <div class="ctrl-group-left">
+            <button class="ctrl-btn" onclick="controlSys('decrease speed')"><i class="fas fa-minus"></i> RPM</button>
+            <button class="ctrl-btn" onclick="controlSys('increase speed')"><i class="fas fa-plus"></i> RPM</button>
+            <div style="width:1px; background:rgba(255,255,255,0.1); margin:0 5px;"></div>
+            <button class="ctrl-btn" onclick="controlSys('decrease temp')"><i class="fas fa-snowflake"></i>Cool</button>
+            <button class="ctrl-btn" onclick="controlSys('increase temp')"><i class="fas fa-fire"></i>Heat</button>
+        </div>
+
+        <div>
+            <button id="masterBtn" class="btn-start" onclick="toggleMaster()">START</button>
+        </div>
+
+        <div class="ctrl-group-right">
+            <button class="ctrl-btn btn-eco" onclick="toggleEco()"><i class="fas fa-leaf"></i> ECO</button>
+            <button class="ctrl-btn btn-repair" onclick="triggerRepair()"><i class="fas fa-wrench"></i> REPAIR</button>
+            <button class="ctrl-btn btn-report" onclick="sendReport()"><i class="fas fa-file-alt"></i> REPORT</button>
+            <div style="width:1px; background:rgba(255,255,255,0.1); margin:0 5px;"></div>
+            <button class="ctrl-btn" onclick="document.getElementById('createOrderModal').style.display='flex'"><i class="fas fa-plus"></i></button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- CONNECT TO SERVER ---
+    const socket = io(); 
+    
+    let isRunning = false;
+    let isLocked = false;
+    let isEcoMode = false;
+    let systemHealth = 100;
+    let currentOrders = [];
+    let inboxNotifications = []; 
+
+    let scene, camera, renderer, knot;
+
+    function initSystem() {
+        initTorusKnot();
+        logSys("System Online. Neural interface active.", "AI");
+    }
+function renderOrders() {
+    ['Pending', 'InProgress', 'QACheck', 'Completed'].forEach(id => {
+        const lane = document.getElementById(`list-${id}`);
+        if (lane) lane.innerHTML = '';
+    });
+
+    const today = new Date("2026-01-17"); // Fixed system reference time
+
+    currentOrders.forEach(order => {
+        const laneId = order.status.replace(/\s+/g, '');
+        const lane = document.getElementById(`list-${laneId}`);
+        if(!lane) return;
+
+        // --- NEW: AI Priority Calculation for Operator ---
+        // Assuming client_orders and production_hub orders are linked or share deadline metadata
+        const deadlineDate = order.deadline ? new Date(order.deadline) : null;
+        let priorityBadge = "";
+        
+        if (deadlineDate) {
+            const diffDays = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
+            let pLabel = "LOW", pColor = "#94a3b8";
+
+            if (diffDays <= 2) { pLabel = "CRITICAL"; pColor = "#ff4757"; }
+            else if (diffDays <= 5) { pLabel = "HIGH"; pColor = "#ffb700"; }
+            else if (diffDays <= 10) { pLabel = "MEDIUM"; pColor = "#00f3ff"; }
+
+            priorityBadge = `<span style="font-size:9px; background:${pColor}; color:#000; padding:1px 5px; border-radius:10px; font-weight:bold; margin-left:5px;">${pLabel}</span>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = `task-card ${order.status === 'In Progress' ? 'active-prod' : ''} ${order.status === 'Completed' ? 'done' : ''} ${order.paused ? 'paused' : ''}`;
+        card.draggable = true;
+        card.ondragstart = (e) => e.dataTransfer.setData("text", order.id);
+        card.onclick = () => showTaskDetails(order.id);
+        
+        card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;">
+                <strong style="color:var(--accent-cyan)">${order.id}</strong>
+                ${priorityBadge}
+            </div>
+            <div style="font-size:11px; color:#ddd;">${order.product} (x${order.quantity})</div>
+            <div class="progress-track"><div class="progress-bar" style="width:${order.progress}%"></div></div>`;
+        lane.appendChild(card);
+    });
+}
+    // --- SOCKET LISTENERS ---
+    
+    socket.on('system_update', (data) => {
+        document.getElementById('rpmVal').innerText = data.rpm;
+        document.getElementById('tempVal').innerText = data.temp + "°C";
+        
+        systemHealth = data.health;
+        updateHealthUI();
+        
+        const btn = document.getElementById('masterBtn');
+        const statusPill = document.getElementById('sysStatus');
+        
+        if (data.status === 'RUNNING') {
+            isRunning = true;
+            btn.innerText = "STOP";
+            btn.className = "btn-stop"; 
+            if(isEcoMode) {
+                statusPill.innerText = "ECO MODE";
+                statusPill.className = "status-pill eco";
+            } else {
+                statusPill.innerText = "ONLINE";
+                statusPill.className = "status-pill online";
+            }
+        } else {
+            isRunning = false;
+            btn.innerText = "START";
+            btn.className = "btn-start"; 
+            statusPill.innerText = "OFFLINE";
+            statusPill.className = "status-pill";
+        }
+
+        update3DVisuals(data.rpm, data.temp);
+    });
+
+    socket.on('order_update', (orders) => {
+        currentOrders = orders;
+        renderOrders();
+    });
+
+    // FEATURE: Reliable Notification Inbox Handling
+    socket.on('new_notification', (data) => {
+        inboxNotifications.unshift(data);
+        updateNotifUI();
+        showToast(data);
+        logSys(`Alert: ${data.message}`, "AI");
+        new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play().catch(() => {});
+    });
+// --- UI FUNCTIONS ---
+    function showTaskDetails(id) {
+        const o = currentOrders.find(order => order.id === id);
+        if(!o) return;
+        
+        document.getElementById('taskContent').innerHTML = `
+            <strong>ORDER ID:</strong> ${o.id}<br>
+            <strong>PRODUCT:</strong> ${o.product}<br>
+            <strong>QUANTITY:</strong> ${o.quantity}<br>
+            <strong>PROGRESS:</strong> ${o.progress}%<br>
+            <strong>STATUS:</strong> ${o.status}
+        `;
+        
+        document.getElementById('btnPause').onclick = () => controlOrder(id, o.paused ? 'resume' : 'pause');
+        document.getElementById('btnDelete').onclick = () => controlOrder(id, 'delete');
+        document.getElementById('taskModal').style.display = 'flex';
+    }
+    function updateNotifUI() {
+        const badge = document.getElementById('notifBadge');
+        const list = document.getElementById('notifInboxList');
+        
+        badge.innerText = inboxNotifications.length;
+        badge.style.display = inboxNotifications.length > 0 ? 'block' : 'none';
+
+        list.innerHTML = inboxNotifications.map(n => `
+            <div class="notif-item">
+                <div class="notif-meta">
+                    <span style="color:var(--accent-cyan); font-weight:bold;">${n.from}</span>
+                    <span>${n.timestamp}</span>
+                </div>
+                <div>${n.message}</div>
+                ${n.type === 'PREDICTION' ? `<button class="notif-btn" onclick="autoOrder('${n.message}')">EXECUTE AUTO-ORDER</button>` : ''}
+            </div>
+        `).join('');
+    }
+
+    function autoOrder(msg) {
+        // Simple extraction: "Suggested: Restock Steel Sheets."
+        const productMatch = msg.match(/Restock (.*?)\./);
+        const product = productMatch ? productMatch[1] : "Steel Sheets";
+        fetch('/api/create_order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ product: product, quantity: 500 })
+        });
+        logSys(`Autonomous replenishment initiated for ${product}.`, "AI");
+    }
+
+    function toggleNotifs() {
+        const inbox = document.getElementById('notifInbox');
+        inbox.style.display = (inbox.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function showToast(data) {
+        const container = document.getElementById('toast-container');
+        let type = "INFO";
+        if (data.from === "CORTEX_AI") type = "WARNING";
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-card ${type}`;
+        toast.innerHTML = `
+            <div class="toast-header"><span>${data.from}</span><span>${data.timestamp}</span></div>
+            <div class="toast-body">${data.message}</div>
+        `;
+        toast.onclick = () => toast.remove();
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 6000);
+    }
+
+    // --- BASE FUNCTIONS ---
+
+    function controlSys(cmd) {
+        if(cmd === 'increase speed') logSys("AI: Increasing Rotor RPM...", "AI");
+        if(cmd === 'decrease speed') logSys("AI: Reducing Rotor RPM...", "AI");
+        sendCommand(cmd);
+    }
+
+    function updateHealthUI() {
+        const bar = document.getElementById('healthBar');
+        const text = document.getElementById('healthText');
+        const predText = document.getElementById('aiPrediction');
+        bar.style.width = systemHealth + "%";
+        text.innerText = Math.floor(systemHealth) + "%";
+        if (systemHealth > 70) { bar.style.background = "var(--accent-green)"; text.style.color = "var(--accent-green)"; predText.innerText = "OPTIMAL"; } 
+        else if (systemHealth > 30) { bar.style.background = "var(--accent-warn)"; text.style.color = "var(--accent-warn)"; predText.innerText = "WEAR DETECTED"; } 
+        else { bar.style.background = "var(--accent-alert)"; text.style.color = "var(--accent-alert)"; predText.innerText = "CRITICAL FAILURE"; }
+    }
+
+    function toggleEco() {
+        isEcoMode = !isEcoMode;
+        logSys(isEcoMode ? "ECO MODE Active. Optimizing power." : "ECO MODE Disabled. Full power.", "AI");
+        if(isEcoMode) sendCommand('decrease speed');
+    }
+
+    function triggerRepair() {
+        if(!isRunning) {
+            logSys("Starting Repair Sequence...", "AI");
+            setTimeout(() => sendCommand('repair'), 2000);
+        } else { logSys("Cannot repair while active. STOP first.", "WARN"); }
+    }
+
+    async function sendReport() {
+        const report = `Status: Health ${systemHealth}%, RPM ${document.getElementById('rpmVal').innerText}.`;
+        await fetch('/api/send_report', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ content: report }) });
+        logSys("Shift report dispatched to Manager.", "AI");
+    }
+
+    function initTorusKnot() {
+        const container = document.getElementById('digital-twin-container');
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.z = 4.5;
+        renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+        const geometry = new THREE.TorusKnotGeometry(1.2, 0.4, 100, 16);
+        const material = new THREE.MeshBasicMaterial({ color: 0x4fffae, wireframe: true, transparent:true, opacity:0.8 });
+        knot = new THREE.Mesh(geometry, material);
+        scene.add(knot);
+        function animate() { requestAnimationFrame(animate); if(knot) { knot.rotation.x += 0.005; knot.rotation.y += 0.005; } renderer.render(scene, camera); }
+        animate();
+    }
+
+    function update3DVisuals(rpm, temp) {
+        if(knot) {
+            const speedFactor = rpm / 50000;
+            knot.rotation.x += speedFactor; knot.rotation.y += speedFactor;
+            knot.material.color.setHex(temp > 90 ? 0xff4757 : 0x4fffae);
+        }
+    }
+
+    function toggleMaster() { sendCommand(isRunning ? 'stop' : 'start'); }
+
+    function toggleLock() {
+        isLocked = !isLocked;
+        document.getElementById('lockedOverlay').style.display = isLocked ? 'flex' : 'none';
+        fetch('/api/system/lock', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ locked: isLocked }) });
+    }
+
+    function submitNewOrder() {
+        const prod = document.getElementById('newOrderProduct').value;
+        const qty = document.getElementById('newOrderQty').value;
+        fetch('/api/create_order', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ product: prod, quantity: qty }) });
+        document.getElementById('createOrderModal').style.display = 'none';
+        logSys(`Order created: ${prod} (x${qty})`, "USER");
+    }
+
+function renderOrders() {
+    ['Pending', 'InProgress', 'QACheck', 'Completed'].forEach(id => {
+        const lane = document.getElementById(`list-${id}`);
+        if (lane) lane.innerHTML = '';
+    });
+
+    currentOrders.forEach(order => {
+        const laneId = order.status.replace(/\s+/g, '');
+        const lane = document.getElementById(`list-${laneId}`);
+        if (!lane) return;
+
+        // FIX: Declare 'card' only ONCE here
+        const card = document.createElement('div'); 
+        
+        // Ensure we use the labels and colors sent from the backend
+        const pLabel = order.priority || "LOW";
+        const pColor = order.priority_color || "#94a3b8";
+
+        card.className = `task-card ${order.status === 'In Progress' ? 'active-prod' : ''} ${order.paused ? 'paused' : ''}`;
+        card.draggable = true;
+        card.ondragstart = (e) => e.dataTransfer.setData("text", order.id);
+        
+        card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                <strong style="color:var(--accent-cyan)">${order.id}</strong>
+                <span style="font-size:9px; background:${pColor}; color:#000; padding:2px 6px; border-radius:10px; font-weight:bold;">
+                    ${pLabel}
+                </span>
+            </div>
+            <div style="font-size:11px; color:#ddd;">${order.product} (x${order.quantity})</div>
+            <div class="progress-track"><div class="progress-bar" style="width:${order.progress}%"></div></div>`;
+        
+        lane.appendChild(card);
+    });
+}
+    function showTaskDetails(id) {
+        const o = currentOrders.find(order => order.id === id);
+        if(!o) return;
+        document.getElementById('taskContent').innerHTML = `ID: ${o.id}<br>Prod: ${o.product}<br>Qty: ${o.quantity}<br>Progress: ${o.progress}%`;
+        document.getElementById('btnPause').onclick = () => controlOrder(id, o.paused ? 'resume' : 'pause');
+        document.getElementById('btnDelete').onclick = () => controlOrder(id, 'delete');
+        document.getElementById('taskModal').style.display = 'flex';
+    }
+
+    function controlOrder(id, action) {
+        fetch('/api/order/control', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ id, action }) })
+        .then(() => document.getElementById('taskModal').style.display = 'none');
+    }
+
+    function drop(ev, newStatus) {
+        ev.preventDefault();
+        const id = ev.dataTransfer.getData("text");
+        fetch('/api/workflow/move', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ id, status: newStatus }) });
+    }
+    function allowDrop(ev) { ev.preventDefault(); }
+
+    // --- AI ASSISTANT CORE ---
+    function sendAiCommand() {
+        const input = document.getElementById('aiInput');
+        const cmd = input.value.trim().toLowerCase();
+        if(!cmd) return;
+        logSys(cmd, "USER");
+        if (cmd.includes("start")) { sendCommand("start"); logSys("Acknowledged. Systems powering up.", "AI"); }
+        else if (cmd.includes("stop")) { sendCommand("stop"); logSys("Initiating shutdown.", "AI"); }
+        else if (cmd.includes("repair")) { triggerRepair(); }
+        else if (cmd.includes("status")) { logSys(`Health: ${systemHealth}%. Speed: ${document.getElementById('rpmVal').innerText} RPM.`, "AI"); }
+        else { socket.emit('ai_command', { cmd }); }
+        input.value = '';
+    }
+
+    function sendCommand(cmd) { socket.emit('ai_command', { cmd }); }
+    function handleEnter(e) { if(e.key === 'Enter') sendAiCommand(); }
+
+    function logSys(msg, type) {
+        const log = document.getElementById('aiLog');
+        const d = document.createElement('div'); d.className = 'log-entry';
+        let prefix = "CORTEX>"; let color = "var(--accent-cyan)";
+        if(type === "USER") { prefix = "OP>"; color = "#888"; }
+        else if(type === "WARN") { prefix = "ALERT>"; color = "var(--accent-warn)"; }
+        d.innerHTML = `<span style="color:${color}; font-weight:bold; margin-right:5px;">${prefix}</span> ${msg}`;
+        log.appendChild(d); log.scrollTop = log.scrollHeight;
+    }
+
+    window.addEventListener('resize', () => {
+        const c = document.getElementById('digital-twin-container');
+        if(renderer && camera) { renderer.setSize(c.clientWidth, c.clientHeight); camera.aspect = c.clientWidth/c.clientHeight; camera.updateProjectionMatrix(); }
+    });
+</script>
+</body>
+</html>

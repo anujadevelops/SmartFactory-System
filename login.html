@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Manufacturing | Access Portal</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a2a33; /* Kept original dark-blue background */
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        /* Blue Header Banner from Screenshot */
+        .header-banner {
+            background-color: #1976d2; 
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .header-banner h1 { margin: 0; font-size: 30px; }
+        .header-banner p { margin: 10px 0 0; opacity: 0.9; }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        /* Glassmorphism GUI Card */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .card h2 { color: #1976d2; margin: 0 0 25px; font-size: 26px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; color: #7cf2d6; font-size: 13px; font-weight: bold; text-transform: uppercase; }
+        
+        /* --- TARGETED CHANGE HERE --- */
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            background-color: #02ca9c !important; /* Forces the dropdown background to black */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        /* Styling for the options inside the black dropdown */
+        .form-group select option {
+            background-color: #02ca9c;
+            color: white;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .checkbox-group { display: flex; align-items: center; margin-bottom: 25px; font-size: 14px; color: rgba(255,255,255,0.8); }
+        .checkbox-group input { margin-right: 10px; cursor: pointer; }
+        .button {
+            background-color: #4caf50; 
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 6px;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .button:hover { background-color: #45a049; transform: translateY(-2px); }
+        .toggle { margin-top: 20px; color: #6cbcff; cursor: pointer; text-decoration: underline; display: block; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="header-banner">
+    <h1>Smart Manufacturing Management System</h1>
+    <p>Welcome - Please Authenticate to Access Dashboard</p>
+</div>
+
+<div class="container">
+    <div class="card">
+        <h2 id="authTitle">Log In</h2>
+        <form id="authForm">
+            <div class="form-group">
+                <label>Work Email</label>
+                <input type="email" id="email" required placeholder="name@company.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <div class="form-group" id="roleGroup">
+                <label>Designation (Role)</label>
+                <select id="role">
+                    <option value="Operator">Operator</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Analyst">Analyst</option>
+                </select>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="rememberMe">
+                <label for="rememberMe">Remember Me & My Role</label>
+            </div>
+            <button type="submit" class="button" id="submitBtn">Log In</button>
+        </form>
+        <p class="toggle" id="toggleLink" onclick="toggleAuth()">Already have an account? Log In</p>
+    </div>
+</div>
+
+<script>
+    let isRegistration = true;
+
+    window.onload = function() {
+        // Clear insecure client-side session storage
+        localStorage.removeItem('userSession');
+    };
+
+    function toggleAuth() {
+        isRegistration = !isRegistration;
+        // Update UI text
+        document.getElementById('authTitle').innerText = isRegistration ? 'Register User' : 'Log In';
+        document.getElementById('submitBtn').innerText = isRegistration ? 'Register' : 'Log In';
+        document.getElementById('toggleLink').innerText = isRegistration ? 'Already have an account? Log In' : 'New User? Register here';
+        
+        // Show/Hide Role dropdown (Role is needed for Registration, but usually implied or fetched for Login)
+        // For simplicity, we keep it visible or you can hide it for login if you prefer.
+        // document.getElementById('roleGroup').style.display = isRegistration ? 'block' : 'none'; 
+    }
+    
+    // --- SECURE AUTHENTICATION LOGIC ---
+    document.getElementById('authForm').onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
+        
+        // Determine Endpoint
+        const endpoint = isRegistration ? '/api/auth/register' : '/api/auth/login';
+        
+        // Build Payload
+        const payload = isRegistration 
+            ? { email, password, role } 
+            : { email, password };
+
+        try {
+            // Send Request to Python Backend
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                if (isRegistration) {
+                    alert("Registration successful! Please log in now.");
+                    toggleAuth(); // Switch mode to Login
+                } else {
+                    // Login Success: Redirect based on Role returned by server
+                    if (data.role === 'Operator') window.location.href = '/operator';
+                    else if (data.role === 'Analyst') window.location.href = '/analyst';
+                    else window.location.href = '/manager-dashboard';
+                }
+            } else {
+                alert("Error: " + data.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Server Connection Error. Ensure app.py is running.");
+        }
+    };
+</script>
+
+</body>
+</html>

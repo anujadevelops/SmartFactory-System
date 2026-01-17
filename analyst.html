@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analyst Command Center | Tier 1</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CORE THEME --- */
+        :root { 
+            --bg: #0f172a; 
+            --panel: rgba(30, 41, 59, 0.7); 
+            --accent: #7cf2d6; 
+            --danger: #ff6b6b; 
+            --warning: #f1c40f; 
+            --info: #3498db; 
+            --terminal-green: #00ff41;
+        }
+
+        body { 
+            margin: 0; 
+            background: radial-gradient(circle at top right,#1e293b,#020617); 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden;
+        }
+
+        /* --- ENLARGED VERTICAL TERMINAL (LEFT) --- */
+        .terminal-panel {
+            width: 400px;
+            background: #000;
+            border-right: 2px solid #1e293b;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .terminal-header {
+            font-size: 16px;
+            color: var(--terminal-green);
+            margin-bottom: 25px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border-bottom: 2px solid rgba(0, 255, 65, 0.2);
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .terminal-body {
+            flex: 1;
+            overflow-y: auto;
+            color: var(--terminal-green);
+            font-size: 14px;
+            line-height: 1.8;
+            scrollbar-width: thin;
+        }
+
+        .log-entry { margin-bottom: 10px; word-wrap: break-word; }
+        .log-time { color: rgba(0, 255, 65, 0.5); font-size: 12px; margin-right: 10px; }
+
+        /* --- MAIN CONTENT AREA --- */
+        .main { 
+            flex: 1; 
+            padding: 25px; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            grid-template-rows: auto auto 1fr; 
+            gap: 20px; 
+            overflow-y: auto; 
+        }
+        
+        .header { 
+            grid-column: 1 / -1; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 15px; 
+            background: rgba(15, 23, 42, 0.4);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* --- LOGOUT BUTTON (TOP RIGHT) --- */
+        .logout-btn {
+            text-decoration: none;
+            color: var(--danger);
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid var(--danger);
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 13px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            color: #000;
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .card { 
+            background: var(--panel); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 15px; 
+            padding: 20px; 
+            position: relative; 
+            backdrop-filter: blur(5px); 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        .card-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8; font-weight: 700; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* --- KPI WIDGETS --- */
+        .kpi-grid { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;}
+        .kpi-value { font-size: 36px; font-weight: bold; color: white; text-shadow: 0 0 20px rgba(255,255,255,0.1);}
+        .kpi-sub { font-size: 12px; color: var(--accent);}
+
+        /* --- CHART & SIMULATION --- */
+        .chart-container { flex:1; width:100%; position:relative; min-height: 250px;}
+        .sim-panel {
+            position: absolute; top: 60px; right: 20px;
+            background: rgba(0,0,0,0.9); border: 1px solid var(--warning);
+            padding: 15px; border-radius: 8px; width: 220px;
+            display: none; z-index: 10; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .sim-control { margin-bottom: 15px; }
+        .sim-label { font-size: 11px; color: #ccc; display: flex; justify-content: space-between; margin-bottom: 5px;}
+        .sim-slider { width: 100%; cursor: pointer; accent-color: var(--warning); }
+
+        /* --- QA APPROVAL ENGINE --- */
+        .qa-list { flex: 1; overflow-y: auto; background: rgba(0,0,0,0.25); border-radius: 10px; padding: 12px; }
+        .qa-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .qa-btn { background: var(--accent); color: #000; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; transition: 0.2s; }
+        .qa-btn:hover { transform: scale(1.05); background: #fff; }
+        .qa-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
+
+        /* --- MISC --- */
+        .matrix-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; flex: 1; }
+        .logic-node { 
+            background: rgba(255,255,255,0.05); border: 1px solid #444; 
+            padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.3s;
+            text-align: center; display: flex; flex-direction: column; justify-content: center;
+        }
+        .logic-node[data-active="true"] { border-color: var(--accent); background: rgba(124, 242, 214, 0.1); box-shadow: 0 0 10px rgba(124, 242, 214, 0.2); }
+        .btn-export { background:transparent; border:1px solid var(--accent); color:var(--accent); padding:8px 18px; border-radius:20px; cursor:pointer; font-weight:bold; transition:0.3s;}
+        .btn-export:hover { background:var(--accent); color:#000; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<aside class="terminal-panel">
+    <div class="terminal-header">
+        <i class="fas fa-terminal"></i> SYSTEM_LOG
+    </div>
+    <div class="terminal-body" id="terminal">
+        <div class="log-entry">> INITIALIZING CORTEX ANALYTICS...</div>
+        <div class="log-entry">> LOADING GOLDEN BATCH HISTORY...</div>
+        <div class="log-entry">> UPLINK SECURE...</div>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="header">
+        <div>
+            <h1 style="margin:0; font-size:24px;"> Core Analytics</h1>
+            <span style="font-size:12px;color:#64748b;">AI Status: PREDICTIVE MODE</span>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center;">
+            <button class="btn-export" onclick="generateAnalystReport()"><i class="fas fa-file-alt"></i> REPORT</button>
+            <a href="/logout" class="logout-btn"><i class="fas fa-power-off"></i> LOGOUT</a>
+        </div>
+    </div>
+
+    <div class="kpi-grid">
+        <div class="card">
+            <div class="card-title">REAL-TIME EFFICIENCY <i class="fas fa-tachometer-alt"></i></div>
+            <div class="kpi-value" id="effVal">--%</div>
+            <div class="kpi-sub" id="effSub">Calibrating...</div>
+        </div>
+        <div class="card">
+            <div class="card-title">TOTAL YIELD <i class="fas fa-cubes"></i></div>
+            <div class="kpi-value" id="prodVal" style="color:var(--warning);">--</div>
+            <div class="kpi-sub">Units Processed</div>
+        </div>
+        <div class="card">
+            <div class="card-title">HEALTH STATUS <i class="fas fa-heartbeat"></i></div>
+            <div class="kpi-value" id="healthVal" style="color:var(--accent);">--%</div>
+            <div class="kpi-sub">Predictive Maintenance</div>
+        </div>
+    </div>
+
+    <div class="card" style="grid-column: 1 / -1;">
+        <div class="card-title">
+            <span>PREDICTIVE STREAM + GOLDEN BATCH</span>
+            <div>
+                <button class="btn-export" id="notifyOpBtn" onclick="sendAlertToOperator()" style="font-size:10px; display:none;"><i class="fas fa-exclamation-circle"></i> ALERT OP</button>
+                <button class="btn-export" onclick="toggleSimulation()" style="font-size:10px;"><i class="fas fa-sliders-h"></i> SIMULATION</button>
+            </div>
+        </div>
+        <div class="chart-container"><canvas id="liveChart"></canvas></div>
+        
+        <div class="sim-panel" id="simPanel">
+            <div style="color:var(--warning); font-size:11px; font-weight:bold; margin-bottom:10px; border-bottom:1px solid #444; padding-bottom:5px;">PREDICTION PARAMETERS</div>
+            <div class="sim-control">
+                <div class="sim-label"><span>RPM Stress</span><span id="val-rpm">0%</span></div>
+                <input type="range" min="0" max="50" value="0" class="sim-slider" oninput="updateSimParam('rpm', this.value)">
+            </div>
+            <div class="sim-control">
+                <div class="sim-label"><span>Cooling Failure</span><span id="val-cool">0%</span></div>
+                <input type="range" min="0" max="100" value="0" class="sim-slider" oninput="updateSimParam('cool', this.value)">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">QA APPROVAL QUEUE <i class="fas fa-clipboard-check"></i></div>
+        <div class="qa-list" id="qaApprovalList">
+            <div style="color:#64748b; font-size:11px; text-align:center; margin-top:50px;">Scanning production lanes...</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">SPECTRAL ANOMALY SCANNER</div>
+        <div style="height:200px;"><canvas id="radarChart"></canvas></div>
+    </div>
+
+    <div class="card" style="grid-column: 1 / -1;">
+        <div class="card-title">AI TUNING</div>
+        <div class="matrix-grid">
+            <div class="logic-node" onclick="toggleNode(this)" data-active="true">
+                <div style="font-size:9px; color:#aaa;">IF TEMP > 90°</div>
+                <div style="font-weight:bold; color:var(--accent);">Active Cooling</div>
+            </div>
+            <div class="logic-node" onclick="toggleNode(this)" data-active="false">
+                <div style="font-size:9px; color:#aaa;">IF VIB > 50Hz</div>
+                <div style="font-weight:bold; color:var(--danger);">Emergency Stop</div>
+            </div>
+            <div class="logic-node" onclick="toggleNode(this)" data-active="true">
+                <div style="font-size:9px; color:#aaa;">IDLE TIMEOUT</div>
+                <div style="font-weight:bold; color:var(--warning);">Eco-Sleep</div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+const socket = io();
+let liveChart, radarChart;
+let showGhost = false;
+let simParams = { rpm: 0, cool: 0 };
+let currentData = { efficiency: 0, yield: 0, health: 100 };
+
+function initCharts() {
+    const ctxLive = document.getElementById('liveChart').getContext('2d');
+    liveChart = new Chart(ctxLive, {
+        type: 'line',
+        data: { 
+            labels: [], 
+            datasets: [
+                { label: 'Live Efficiency', data: [], borderColor: '#7cf2d6', tension: 0.4, fill: true, order: 2 },
+                { label: 'Golden Batch', data: [], borderColor: '#2ecc71', borderDash: [5, 5], pointRadius: 0, fill: false, order: 1 },
+                { label: 'Future-Cast', data: [], borderColor: '#f1c40f', borderDash: [2, 2], pointRadius: 0, hidden: true, order: 0 }
+            ] 
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { min: 0, max: 100 } } }
+    });
+
+    const ctxRadar = document.getElementById('radarChart').getContext('2d');
+    radarChart = new Chart(ctxRadar, {
+        type: 'radar',
+        data: { 
+            labels: ['Thermal', 'Acoustic', 'Vibration', 'Power', 'Latency'], 
+            datasets: [{ label: 'Signature', data: [50, 50, 50, 50, 50], backgroundColor: 'rgba(124, 242, 214, 0.2)', borderColor: '#7cf2d6' }] 
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { r: { suggestedMin: 0, suggestedMax: 100 } }, plugins: { legend: { display: false } } }
+    });
+}
+
+socket.on('system_update', (data) => {
+    currentData = data;
+    document.getElementById('effVal').innerText = data.efficiency + "%";
+    document.getElementById('prodVal').innerText = data.yield;
+    document.getElementById('healthVal').innerText = Math.floor(data.health) + "%";
+    updateLiveChart(data);
+    updateRadarScanner(data);
+});
+
+socket.on('order_update', (orders) => {
+    const qaContainer = document.getElementById('qaApprovalList');
+    const pendingQA = orders.filter(o => o.status === 'QA Check');
+    if (pendingQA.length === 0) {
+        qaContainer.innerHTML = '<div style="color:#64748b; font-size:11px; text-align:center; margin-top:50px;">NO PENDING QA</div>';
+        return;
+    }
+    qaContainer.innerHTML = pendingQA.map(o => `
+        <div class="qa-item">
+            <div style="font-size:12px;"><strong>${o.id}</strong><br><span style="color:#64748b">${o.product}</span></div>
+            <button class="qa-btn" onclick="authorizeOrder('${o.id}')">AUTHORIZE</button>
+        </div>
+    `).join('');
+});
+
+function authorizeOrder(orderId) {
+    logToTerminal(`QA AUTHORIZATION: Transmitting approval for ${orderId}...`, "#7cf2d6");
+    fetch('/api/workflow/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: orderId, status: 'Completed' })
+    }).then(() => logToTerminal(`ORDER ${orderId} VERIFIED`, "#7cf2d6"));
+}
+
+function updateLiveChart(data) {
+    const time = new Date().toLocaleTimeString();
+    if(liveChart.data.labels.length > 20) {
+        liveChart.data.labels.shift();
+        liveChart.data.datasets[0].data.shift();
+        liveChart.data.datasets[1].data.shift();
+    }
+    liveChart.data.labels.push(time);
+    liveChart.data.datasets[0].data.push(data.efficiency);
+    liveChart.data.datasets[1].data.push(95);
+    
+    if(showGhost) {
+        let pred = data.efficiency - (simParams.rpm / 2) - (simParams.cool / 3);
+        liveChart.data.datasets[2].hidden = false;
+        liveChart.data.datasets[2].data.push(pred);
+    }
+    liveChart.update();
+}
+
+function updateRadarScanner(data) {
+    const thermal = Math.min(100, (data.temp / 90) * 80);
+    const vibration = Math.min(100, Math.abs(data.rpm - 1200) / 10);
+    radarChart.data.datasets[0].data = [thermal, Math.random()*30, vibration, 60, 40];
+    radarChart.update();
+}
+
+function toggleSimulation() {
+    showGhost = !showGhost;
+    document.getElementById('simPanel').style.display = showGhost ? 'block' : 'none';
+}
+
+function updateSimParam(type, val) {
+    simParams[type] = parseInt(val);
+    document.getElementById(`val-${type}`).innerText = val + "%";
+}
+
+function logToTerminal(msg, color = "#00ff41") {
+    const term = document.getElementById('terminal');
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.innerHTML = `<span class="log-time">[${new Date().toLocaleTimeString()}]</span> >> <span style="color:${color}">${msg}</span>`;
+    term.prepend(entry);
+}
+
+function generateAnalystReport() {
+    logToTerminal("UPLINK: Transmitting Intel to Management Node...", "#3498db");
+    const now = new Date();
+    const content = `ANALYST REPORT: Efficiency: ${currentData.efficiency}%, Yield: ${currentData.yield}, Health: ${currentData.health}%. Predictive Risk: ${simParams.cool}%`;
+    
+    // Send to Backend for Manager Overview
+    fetch('/api/send_report', { 
+        method: 'POST', 
+        headers: {'Content-Type':'application/json'}, 
+        body: JSON.stringify({ content: content }) 
+    }).then(() => {
+        logToTerminal("UPLINK SUCCESSFUL", "var(--accent)");
+        // Download Local Copy
+        const blob = new Blob([content], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Analyst_Snapshot.txt`;
+        a.click();
+    });
+}
+
+function toggleNode(el) {
+    const isActive = el.getAttribute('data-active') === 'true';
+    el.setAttribute('data-active', !isActive);
+    logToTerminal(`LOGIC MATRIX: Node toggled to ${!isActive ? 'OFF' : 'ON'}`);
+}
+
+initCharts();
+</script>
+</body>
+</html>

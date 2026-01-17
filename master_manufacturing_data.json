@@ -1,0 +1,714 @@
+{
+  "production_hub": {
+    "orders": [
+      {
+        "id": "#ORD-2725",
+        "product": "Hydraulic Valve",
+        "quantity": 200,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 01:30:03"
+      },
+      {
+        "id": "#ORD-3276",
+        "product": "Hydraulic Valve",
+        "quantity": 200,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 01:30:34"
+      },
+      {
+        "id": "#ORD-3759",
+        "product": "Hydraulic Valve",
+        "quantity": 100,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 01:42:05"
+      },
+      {
+        "id": "#ORD-9374",
+        "product": "Hydraulic Valve",
+        "quantity": 200,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 01:42:15"
+      },
+      {
+        "id": "#ORD-9338",
+        "product": "",
+        "quantity": 500,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 02:35:14"
+      },
+      {
+        "id": "#ORD-8644",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 03:34:47"
+      },
+      {
+        "id": "#ORD-7787",
+        "product": "Hydraulic Valve",
+        "quantity": 100,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 03:35:12"
+      },
+      {
+        "id": "#ORD-1241",
+        "product": "Lubricant",
+        "quantity": 500,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 03:43:46"
+      },
+      {
+        "id": "#ORD-3142",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 04:27:44"
+      },
+      {
+        "id": "#ORD-9254",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "progress": 0,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 04:38:11"
+      },
+      {
+        "id": "#ORD-8096",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "progress": 0,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 04:38:12"
+      },
+      {
+        "id": "#ORD-4706",
+        "product": "Steel Sheets",
+        "quantity": 1000,
+        "progress": 0,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 04:44:02"
+      },
+      {
+        "id": "#ORD-2176",
+        "product": "Steel Sheets",
+        "quantity": 10,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 04:44:39"
+      },
+      {
+        "id": "#ORD-5705",
+        "product": "Copper Wire",
+        "quantity": 100,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 04:50:45"
+      },
+      {
+        "id": "#ORD-7609",
+        "product": "Lubricant",
+        "quantity": 50,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 05:11:16"
+      },
+      {
+        "id": "#ORD-6684",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 05:11:23"
+      },
+      {
+        "id": "#ORD-2917",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 05:19:08"
+      },
+      {
+        "id": "#ORD-1754",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 05:31:31"
+      },
+      {
+        "id": "#ORD-5103",
+        "product": "Hydraulic Valve",
+        "quantity": 100,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 05:32:30"
+      },
+      {
+        "id": "#ORD-4592",
+        "product": "Hydraulic Valve",
+        "quantity": 100,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 05:33:24"
+      },
+      {
+        "id": "#ORD-4061",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "progress": 90,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 05:34:39"
+      },
+      {
+        "id": "#ORD-9240",
+        "product": "Copper Wire",
+        "quantity": 500,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 05:56:32"
+      },
+      {
+        "id": "#ORD-6945",
+        "product": "Hydraulic Valve",
+        "quantity": 100,
+        "progress": 45,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 06:14:23"
+      },
+      {
+        "id": "#ORD-1522",
+        "product": "Hydraulic Valve",
+        "quantity": 100,
+        "progress": 45,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 06:14:25"
+      },
+      {
+        "id": "#ORD-1186",
+        "product": "Hydraulic Valve",
+        "quantity": 100,
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 06:43:37"
+      },
+      {
+        "id": "#ORD-2421",
+        "product": "Steel Sheets",
+        "quantity": 100,
+        "deadline": "2026-01-25",
+        "progress": 100,
+        "status": "QA Check",
+        "paused": false,
+        "start_time": "2026-01-17 08:07:04"
+      },
+      {
+        "id": "#ORD-4151",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "deadline": "2026-01-25",
+        "progress": 100,
+        "status": "QA Check",
+        "paused": false,
+        "start_time": "2026-01-17 08:09:27"
+      },
+      {
+        "id": "#ORD-5524",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "deadline": "2026-01-25",
+        "progress": 100,
+        "status": "Pending",
+        "paused": false,
+        "start_time": "2026-01-17 08:09:29"
+      },
+      {
+        "id": "#ORD-6557",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "deadline": "2026-01-18",
+        "priority": "CRITICAL",
+        "priority_color": "#ff4757",
+        "progress": 100,
+        "status": "QA Check",
+        "paused": false,
+        "start_time": "2026-01-17 08:20:08"
+      },
+      {
+        "id": "#ORD-5706",
+        "product": "Lubricant",
+        "quantity": 500,
+        "deadline": "2026-01-18",
+        "priority": "CRITICAL",
+        "priority_color": "#ff4757",
+        "progress": 100,
+        "status": "In Progress",
+        "paused": false,
+        "start_time": "2026-01-17 08:20:12"
+      },
+      {
+        "id": "#ORD-8744",
+        "product": "Copper Wire",
+        "quantity": 100,
+        "deadline": "2026-01-18",
+        "priority": "CRITICAL",
+        "priority_color": "#ff4757",
+        "progress": 0,
+        "status": "Pending",
+        "paused": false,
+        "start_time": "2026-01-17 08:20:18"
+      },
+      {
+        "id": "#ORD-2795",
+        "product": "Microchips",
+        "quantity": 100,
+        "deadline": "2026-01-21",
+        "priority": "HIGH",
+        "priority_color": "#ffb700",
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 08:20:35"
+      },
+      {
+        "id": "#ORD-1917",
+        "product": "Steel Sheets",
+        "quantity": 500,
+        "deadline": "2026-01-18",
+        "priority": "CRITICAL",
+        "priority_color": "#ff4757",
+        "progress": 100,
+        "status": "In Progress",
+        "paused": false,
+        "start_time": "2026-01-17 08:29:44"
+      },
+      {
+        "id": "#ORD-9879",
+        "product": "Microchips",
+        "quantity": 100,
+        "deadline": "2026-01-17",
+        "priority": "CRITICAL",
+        "priority_color": "#ff4757",
+        "progress": 0,
+        "status": "Pending",
+        "paused": false,
+        "start_time": "2026-01-17 11:05:07"
+      },
+      {
+        "id": "#ORD-5061",
+        "product": "Steel Sheets",
+        "quantity": 100,
+        "deadline": null,
+        "priority": "NORMAL",
+        "priority_color": "#94a3b8",
+        "progress": 100,
+        "status": "In Progress",
+        "paused": false,
+        "start_time": "2026-01-17 11:18:35"
+      },
+      {
+        "id": "#ORD-1315",
+        "product": "Steel Sheets",
+        "quantity": 100,
+        "deadline": null,
+        "priority": "NORMAL",
+        "priority_color": "#94a3b8",
+        "progress": 100,
+        "status": "Completed",
+        "paused": false,
+        "start_time": "2026-01-17 11:44:47"
+      }
+    ],
+    "efficiency_history": [],
+    "yield_total": 0,
+    "reports": [
+      {
+        "timestamp": "2026-01-17 12:18:56",
+        "type": "SUCCESS",
+        "content": "OPERATOR: Completed #ORD-1241. Revenue generated: $25000",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 11:50:42",
+        "type": "OPERATOR",
+        "content": "Status: Health 100%, RPM 0.",
+        "author": "Operator Node"
+      },
+      {
+        "timestamp": "2026-01-17 11:48:53",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 11:45:48",
+        "type": "SUCCESS",
+        "content": "OPERATOR: Completed #ORD-2795. Revenue generated: $5000",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 11:45:27",
+        "type": "SUCCESS",
+        "content": "OPERATOR: Completed #ORD-1315. Revenue generated: $5000",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 11:44:47",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-1315 (Steel Sheets x100) created. Cost: $1500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 11:25:28",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 11:21:50",
+        "type": "SUCCESS",
+        "content": "OPERATOR: Completed #ORD-1186. Revenue generated: $5000",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 11:20:59",
+        "type": "OPERATOR",
+        "content": "Status: Health 92%, RPM 0.",
+        "author": "Operator Node"
+      },
+      {
+        "timestamp": "2026-01-17 11:18:35",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-5061 (Steel Sheets x100) created. Cost: $1500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 11:16:28",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 11:11:14",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 11:05:07",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-9879 (Microchips x100) created. Cost: $1500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 11:04:32",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 10:54:29",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 10:47:47",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 10:20:11",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 10:13:29",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 10:06:47",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 10:00:05",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 08:29:44",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-1917 (Steel Sheets x500) created. Cost: $7500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 08:26:39",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 08:20:35",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-2795 (Microchips x100) created. Cost: $1500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 08:20:18",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-8744 (Copper Wire x100) created. Cost: $1500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 08:20:12",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-5706 (Lubricant x500) created. Cost: $7500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 08:20:08",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-6557 (Steel Sheets x500) created. Cost: $7500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 08:09:29",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-5524 (Steel Sheets x500) created. Cost: $7500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 08:09:27",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-4151 (Steel Sheets x500) created. Cost: $7500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 08:07:04",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-2421 (Steel Sheets x100) created. Cost: $1500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 08:06:06",
+        "type": "SALES",
+        "content": "CLIENT ORDER: SLS-90125 via e-Dukaan (1000x COPPER WIRE)",
+        "author": "Web Portal"
+      },
+      {
+        "timestamp": "2026-01-17 08:05:57",
+        "type": "SALES",
+        "content": "CLIENT ORDER: SLS-76328 via e-Dukaan (100x STEEL SHEETS)",
+        "author": "Web Portal"
+      },
+      {
+        "timestamp": "2026-01-17 08:05:45",
+        "type": "SALES",
+        "content": "CLIENT ORDER: SLS-26965 via e-Dukaan (1100x MICROCHIP)",
+        "author": "Web Portal"
+      },
+      {
+        "timestamp": "2026-01-17 08:03:36",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 08:00:12",
+        "type": "SALES",
+        "content": "CLIENT ORDER: SLS-10314 via e-Dukaan (1000x MICROCHIP)",
+        "author": "Web Portal"
+      },
+      {
+        "timestamp": "2026-01-17 07:59:26",
+        "type": "SALES",
+        "content": "CLIENT ORDER: SLS-84125 via e-Dukaan (10x MICROCHIP)",
+        "author": "Web Portal"
+      },
+      {
+        "timestamp": "2026-01-17 07:59:15",
+        "type": "SALES",
+        "content": "CLIENT ORDER: SLS-52819 via e-Dukaan (1000x COPPER WIRE)",
+        "author": "Web Portal"
+      },
+      {
+        "timestamp": "2026-01-17 07:59:07",
+        "type": "SALES",
+        "content": "CLIENT ORDER: SLS-91719 via e-Dukaan (500x STEEL SHEETS)",
+        "author": "Web Portal"
+      },
+      {
+        "timestamp": "2026-01-17 07:56:55",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 07:50:42",
+        "type": "SALES",
+        "content": "CLIENT ORDER: SLS-91199 via e-Dukaan (500x STEEL SHEETS)",
+        "author": "Web Portal"
+      },
+      {
+        "timestamp": "2026-01-17 07:24:06",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 07:16:26",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 07:09:44",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 07:04:02",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 06:43:37",
+        "type": "INFO",
+        "content": "PRODUCTION ORDER: #ORD-1186 (Hydraulic Valve x100) created. Cost: $1500",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 06:42:15",
+        "type": "SALES",
+        "content": "CLIENT ORDER: SLS-67322 via e-Dukaan (500x STEEL SHEETS)",
+        "author": "Web Portal"
+      },
+      {
+        "timestamp": "2026-01-17 06:20:41",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 06:16:19",
+        "type": "OPERATOR",
+        "content": "Status: Health 93%, RPM 1209.",
+        "author": "Operator Node"
+      },
+      {
+        "timestamp": "2026-01-17 06:15:20",
+        "type": "MAINTENANCE",
+        "content": "CRITICAL HEALTH DETECTED. AI Auto-Repair Executed.",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 06:15:10",
+        "type": "SUCCESS",
+        "content": "OPERATOR: Completed #ORD-1522. Revenue generated: $5000",
+        "author": "System AI"
+      },
+      {
+        "timestamp": "2026-01-17 06:15:08",
+        "type": "SUCCESS",
+        "content": "OPERATOR: Completed #ORD-6945. Revenue generated: $5000",
+        "author": "System AI"
+      }
+    ]
+  },
+  "inventory": [
+    {
+      "name": "Steel Sheets",
+      "stock": 0,
+      "max": 2000,
+      "burnRate": 15
+    },
+    {
+      "name": "Copper Wire",
+      "stock": 2000,
+      "max": 2000,
+      "burnRate": 5
+    },
+    {
+      "name": "Lubricant",
+      "stock": 1000,
+      "max": 1000,
+      "burnRate": 8
+    },
+    {
+      "name": "Microchips",
+      "stock": 1000,
+      "max": 1000,
+      "burnRate": 2
+    }
+  ],
+  "logs": [],
+  "financials": {
+    "revenue": 438000,
+    "cost": 147900
+  },
+  "users": [
+    {
+      "email": "anuja@gmail.com",
+      "password": "scrypt:32768:8:1$UXOJiUL97Boyhyqo$987cb862e7cb6377ca3f36f3502476cf25779956f5bfaf3552938519e9d00b6ec2b228185b660cb66eade5c63f0ca72dd1d367fc27a4d4bd631a35fa7659b924",
+      "role": "Operator"
+    },
+    {
+      "email": "harshad@gmail.com",
+      "password": "scrypt:32768:8:1$I368zMluRqeMtbXR$7e4d67ef83a7577b2e3757dcad5a8e9104846585f279bfb8af0f807a0dac4ac19296d5e8b0feedd5ea1ae1634e34367a7b18c32f9a18b9575dd1f2695b40fd51",
+      "role": "Manager"
+    },
+    {
+      "email": "gaurav@gmail.com",
+      "password": "scrypt:32768:8:1$mICqLD5sXWbk5tzW$40321fe949dade5873390d0fbe375b1c47a8965355a994f524ce86709883b3fc1624a5ab0f355c30e47501a1c217023ac536de9de39d177cdb7f652bafac3352",
+      "role": "Analyst"
+    },
+    {
+      "email": "harsad@gmail.com",
+      "password": "scrypt:32768:8:1$fZKnVPzMi1lvagAB$548a7f566bbcd3cdd7fc09df136919ffd70ae03b4d4a179095eb0b97265fd32bab0c8898f17888b8f247c16e6f8e8dcf685c2899f112e9a314dab97ae65089c9",
+      "role": "Manager"
+    }
+  ]
+}
